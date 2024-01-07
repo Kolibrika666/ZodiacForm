@@ -9,16 +9,30 @@ class ZodiacForm extends React.Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+
+    this.button = false;
+    this.pred = false;
+
+    this.predText = "";
   }
 
   handleChange(event) {
-    this.setState({ value: event.target.value });
+    this.setState({
+      value: event.target.value,
+    });
+    this.button = true;
+    this.pred = false;
   }
 
   handleSubmit(event) {
+    this.setState({
+      value: event.target.value,
+    });
+    this.pred = true;
+    this.button = true;
     event.preventDefault();
+    this.predText = this.state.value;
   }
-
   render() {
     return (
       <form onSubmit={this.handleSubmit}>
@@ -30,10 +44,13 @@ class ZodiacForm extends React.Component {
             ))}
           </select>
         </label>
-        <div>
-          <input type="submit" value="Получить предсказание" />
-          <p>{this.state.value}</p>
-        </div>
+
+        {this.button && (
+          <div>
+            <button type="submit">Получить предсказание</button>
+            {this.pred && <p>{this.predText}</p>}
+          </div>
+        )}
       </form>
     );
   }
