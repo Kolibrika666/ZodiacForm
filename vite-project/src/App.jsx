@@ -1,38 +1,31 @@
 import "./App.css";
 import React from "react";
-import zodiacDeck from "./zodiac/zodiacDesc";
-import getZodiak from "./zodiac/dateZodiacFunction";
+import zodiacDeck from "./components/zodiacDeck";
 
-class ZodiacForm extends React.Component {
+class Form extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { value: "" };
+    this.state = { value: "", text: "", button: false, p: false };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-
-    this.button = false;
-    this.pred = false;
-
-    this.predText = "";
   }
-
   handleChange(event) {
     this.setState({
       value: event.target.value,
+      button: true,
     });
-    this.button = true;
-    this.pred = false;
   }
+}
 
+class ZodiacForm extends Form {
   handleSubmit(event) {
     this.setState({
       value: event.target.value,
+      p: true,
+      text: this.state.value,
     });
-    this.pred = true;
-    this.button = true;
     event.preventDefault();
-    this.predText = this.state.value;
   }
   render() {
     return (
@@ -46,10 +39,10 @@ class ZodiacForm extends React.Component {
           </select>
         </label>
 
-        {this.button && (
+        {this.state.button && (
           <div>
             <button type="submit">Получить предсказание</button>
-            {this.pred && <p>{this.predText}</p>}
+            {this.state.p && <p>{this.state.text}</p>}
           </div>
         )}
       </form>
@@ -57,41 +50,17 @@ class ZodiacForm extends React.Component {
   }
 }
 
-class DateZodiacForm extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = { value: "" };
-
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-
-    this.button = false;
-    this.pred = false;
-
-    this.predText = "2 2 1996";
-  }
-
-  handleChange(event) {
-    this.setState({ value: event.target.value });
-    this.button = true;
-    this.pred = false;
-  }
-
+class DateZodiacForm extends Form {
   handleSubmit(event) {
-    this.pred = true;
-    this.button = true;
-    let date = this.state.value;
-    date = new Date(date);
+    const date = new Date(this.state.value);
     date.setFullYear("2009");
-    zodiacDeck.map((e) => {
-      let arr = Array.from(e.date);
-      arr[0] = new Date(arr[0]);
-      arr[1] = new Date(arr[1]);
-      if (date >= arr[0] && date <= arr[1])
-        alert(`Ваш знак зодиака - ${e.zodiac}, ваше предсказание - ${e.pred}`);
+    zodiacDeck.forEach((item) => {
+      const [start, end] = item.date;
+      const isCorrect = date >= new Date(start) && new Date(end);
+      if (isCorrect) {
+        this.setState({ text: item.pred, p: true });
+      }
     });
-
     event.preventDefault();
   }
 
@@ -109,10 +78,10 @@ class DateZodiacForm extends React.Component {
             onChange={this.handleChange}
           />
         </label>
-        {this.button && (
+        {this.state.button && (
           <div>
             <button type="submit">Получить предсказание</button>
-            {this.pred && <p>{this.predText}</p>}
+            {this.state.p && <p>{this.state.text}</p>}
           </div>
         )}
       </form>
